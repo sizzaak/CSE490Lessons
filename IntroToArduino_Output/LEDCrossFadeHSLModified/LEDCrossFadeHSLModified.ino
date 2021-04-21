@@ -28,8 +28,11 @@ const int RGB_BLUE_PIN  = 6; // blue wire
 const int DELAY_INTERVAL = 50; // interval in ms between incrementing hues
 const byte MAX_RGB_VALUE = 255;
 
-float _hue = 0; //hue varies between 0 - 1
-float _step = 0.001f;
+float _hue = 0; // hue varies between 0 - 1
+float _hueStep = 0.1f;
+float _saturation = 0; // saturation varies between 0 - 1
+float _saturationStep = 0.05f;
+bool _saturationIncreasing = true; // false when saturation decreasing
 
 RGBConverter _rgbConverter;
 
@@ -50,10 +53,12 @@ void loop() {
   // and that RGB ranges from 0 - 255
   // If lightness is equal to 1, then the RGB LED will be white
   byte rgb[3];
-  _rgbConverter.hslToRgb(_hue, 1, 0.5, rgb);
+  _rgbConverter.hslToRgb(_hue, _saturation, 0.2, rgb);
 
   Serial.print("hue=");
   Serial.print(_hue);
+  Serial.print("saturation=");
+  Serial.print(_saturation);
   Serial.print(" r=");
   Serial.print(rgb[0]);
   Serial.print(" g=");
@@ -63,12 +68,25 @@ void loop() {
   
   setColor(rgb[0], rgb[1], rgb[2]); 
 
-  // update hue based on step size
-  _hue += _step;
+  // update saturation level
+  if (_saturationIncreasing) {
+    _saturation += _saturationStep;
+  } else {
+    _saturation -= _saturationStep;
+  }
 
-  // hue ranges between 0-1, so if > 1, reset to 0
-  if(_hue > 1.0){
-    _hue = 0;
+  // reverse saturation at maximums, and update hue at 0 saturation
+  if (_saturation >= 1.0) {
+    _saturation = 1.0;
+    _saturationIncreasing = false;
+  } else if (_saturation <= 0.0) {
+    _saturation = 0.0;
+    _saturationIncreasing = true;
+    _hue += _hueStep;
+    // hue ranges between 0-1, so if > 1, reset to 0
+    if(_hue > 1.0){
+      _hue = 0;
+    }
   }
 
   delay(DELAY_INTERVAL);
