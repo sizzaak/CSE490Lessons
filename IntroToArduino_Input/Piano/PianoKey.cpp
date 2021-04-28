@@ -1,10 +1,12 @@
+#include <PushButton.h>
+
 #include "PianoKey.h"
 
-PianoKey::PianoKey(int ledPin, int butPin) :
-    _ledPin(ledPin), _butPin(butPin) {
+PianoKey::PianoKey(int ledPin, int butPin) : _ledPin(ledPin), _butPin(butPin), _button(PushButton(butPin)) {
   _brightness = 0;
   pinMode(_ledPin, OUTPUT);
   pinMode(_butPin, INPUT_PULLUP);
+  //_button = PushButton(butPin);
 }
 
 void PianoKey::turnOn() {
@@ -23,7 +25,9 @@ void PianoKey::fadeOut() {
 
 bool PianoKey::isPressed() {
   // XOR to flip read output if buttons are active on LOW
-  return digitalRead(_butPin) ^ BUTTONS_ACTIVE_LOW;
+  _button.update();
+  Serial.print(_button.isActive());
+  return _button.isActive() ^ BUTTONS_ACTIVE_LOW;
 }
 
 bool PianoKey::update() {

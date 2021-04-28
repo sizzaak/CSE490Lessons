@@ -1,3 +1,5 @@
+#include <PushButton.h>
+
 // Manages a piano key light and the button associated with it.  Actual playing
 // of the sounds is left to the client.
 
@@ -30,5 +32,6 @@ class PianoKey {
     const int _ledPin;
     const int _butPin;
 
+    PushButton _button;
     int _brightness;
 };

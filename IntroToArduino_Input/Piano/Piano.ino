@@ -33,6 +33,7 @@ const int OUTPUT_PIEZO_PIN = 13;
 
 void setup() {
   pinMode(OUTPUT_PIEZO_PIN, OUTPUT);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -48,6 +49,7 @@ void loop() {
   bool EPressed = _EKey.update();
   bool FPressed = _FKey.update();
   bool GPressed = _GKey.update();
+  Serial.println();
   if(CPressed){
     tone(OUTPUT_PIEZO_PIN, KEY_C);
   }else if(DPressed){
