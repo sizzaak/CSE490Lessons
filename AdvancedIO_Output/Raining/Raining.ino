@@ -19,6 +19,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 // --------------------------------------------------------------------------
 
 const int DROP_COUNT = 30;
+const int MAX_ANALOG_INPUT = 1023;
+const int ANALOG_INPUT_PIN = A0;
 
 Droplet* _drops[DROP_COUNT];
 
@@ -35,14 +37,18 @@ void setup() {
   }
   // --------------------------------------------------------------------------
   for (int i=0; i<DROP_COUNT; i++) {
+    Serial.println(i);
     _drops[i] = new Droplet(SCREEN_WIDTH, SCREEN_HEIGHT, &display);
   }
+  display.clearDisplay();
 }
 
 void loop() {
   display.clearDisplay();
+  int analogInput = analogRead(ANALOG_INPUT_PIN);
+  int windSpeed = map(analogInput, 0, MAX_ANALOG_INPUT, 0, 100);
   for (int i=0; i<DROP_COUNT; i++) {
-    _drops[i]->update();
+    _drops[i]->update(windSpeed);
   }
   display.display();
 }

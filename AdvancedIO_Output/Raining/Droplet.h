@@ -11,7 +11,7 @@ class Droplet {
     Droplet();
 
     // Run every step to animate
-    void update();
+    void update(int windSpeed);
 
   private:
     const int kScreenWidth;
