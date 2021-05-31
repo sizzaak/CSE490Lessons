@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Web Serial Demo</title>
+        <script src="https://cdn.jsdelivr.net/gh/makeabilitylab/p5js/_libraries/serial.js"></script>
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+
+    <body>
+        <div id="main-content">
+            <button id="connect-button" onclick="onButtonConnectToSerialDevice()">
+                Connect via Serial Port
+            </button>
+            <div id="text-interface">
+                <h3>Enter operands:</h3>
+                <input id="operand-1" value="0"/>
+                +
+                <input id="operand-2" value="0"/>
+        
+                <h3>Sent to Arduino:</h3>
+                <p id="output-text"></p>
+        
+                <h3>Received from Arduino:</h3>
+                <p id="received-text"></p>
+            </div>
+        </div>
+        <script>
+            // Setup Web Serial using serial.js
+            const serial = new Serial();
+            serial.on(SerialEvents.CONNECTION_OPENED, onSerialConnectionOpened);
+            serial.on(SerialEvents.CONNECTION_CLOSED, onSerialConnectionClosed);
+            serial.on(SerialEvents.DATA_RECEIVED, onSerialDataReceived);
+            serial.on(SerialEvents.ERROR_OCCURRED, onSerialErrorOccurred);
+
+            const firstInput = document.getElementById('operand-1');
+            const secondInput = document.getElementById('operand-2');
+            const outputText = document.getElementById('output-text');
+            const rcvdText = document.getElementById('received-text');
+
+            firstInput.addEventListener('input', updateOutputText);
+            secondInput.addEventListener('input', updateOutputText);
+
+            // Called automatically when the input textbox is updated
+            function updateOutputText(e) {
+                console.log("Text updated");
+                outputText.textContent = firstInput.value + "," + secondInput.value;
+                serialWriteTextData(firstInput.value + "," + secondInput.value);
+            }
+
+            // Send text data over serial
+            async function serialWriteTextData(textData) {
+                if (serial.isOpen()) {
+                console.log("Writing to serial: ", textData);
+                serial.writeLine(textData);
+                }
+            }
+          
+            async function onButtonConnectToSerialDevice() {
+                console.log("onButtonConnectToSerialDevice");
+                if (!serial.isOpen()) {
+                    await serial.connectAndOpen();
+                }
+            }
+          
+            function onSerialErrorOccurred(eventSender, error) {
+                console.log("onSerialErrorOccurred", error);
+            }
+          
+            function onSerialConnectionOpened(eventSender) {
+                console.log("onSerialConnectionOpened", eventSender);
+                document.getElementById("connect-button").style.display = "none";
+                document.getElementById("text-interface").style.display = "block";
+            }
+          
+            function onSerialConnectionClosed(eventSender) {
+                console.log("onSerialConnectionClosed", eventSender);
+            }
+          
+            function onSerialDataReceived(eventSender, newData) {
+                console.log("onSerialDataReceived", newData);
+                rcvdText.textContent = newData;
+            }
+          
+            async function onConnectButtonClick() {
+                console.log("Connect button clicked!");
+            }
+          </script>
+    </body>
+</html>
